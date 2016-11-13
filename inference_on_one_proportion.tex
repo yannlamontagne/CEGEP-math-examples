@@ -1,0 +1,319 @@
+\documentclass{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\setlength{\parindent}{0.0in}
+\usepackage{pgfplots}
+\pgfmathdeclarefunction{gauss}{2}{%
+  \pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}%
+}
+
+\usepackage{enumitem}
+\setlist{nolistsep}
+\usetikzlibrary{patterns}
+
+\begin{document}
+
+\textbf{Inference for a Single Proportion}\footnote{Licensed under the GNU Free Documentation License or the Creative Commons Attribution-ShareAlike License. \today}\\
+\textit{by Yann Lamontagne}\\
+
+\textbf{Example:}
+An open source advocate claims Mozilla Thunderbird is used by at least 75\% of 
+internet users.  A random sample of 300 internet users included 216 that use Mozilla 
+Thunderbird.  
+\begin{enumerate} 
+\item[a.] State the hypotheses.
+\item[b.] Verify the conditions to test the hypotheses.
+\item[c.] Define the rejection region with respect to the sampling distribution and the rejection region with respect to the standard normal distribution at 5\% significance.
+\item[d.] Test the hypothesis using the sample proportion, the test statistic and p-value at 5\% significance.
+\item[e.] Determine the probability of committing an error (Type I or Type II) in the hypothesis test assumming that the true proportion of the population is $p_a=0.68$.
+\item[f.] Determine the power of the test assumming that the true proportion of the population is $p_a=0.68$.
+\item[g.] Determine the sample size to control the error at $\alpha=\beta=0.05$ assuming that the true proportion of the population is $p_a=0.68$.
+\end{enumerate}
+\vspace{0.1in}
+
+\textbf{a. State the hypotheses.}
+
+The text gives the following definition
+
+\begin{quote}
+The \emph{null hypothesis} ($H_0$) often represents either a skeptical perspective 
+or a claim to be tested. The \emph{alternative hypothesis} ($H_a$) represents an alternative 
+claim under consideration and is often represented by a range of possible parameter values.\cite{OS}
+\end{quote}
+
+In this problem:\\
+$H_0: p=0.75$ ($\geq$), that is Mozilla Thunderbird is used by at least 75\% of
+internet users.\\
+$H_a: p<0.75$, that is Mozilla Thunderbird is used by less than 75\% of internet users.\\
+
+Remember that the null hypothesis must be the hypothesis containing the equality, 
+as the sampling distribution on which the hypothesis test is performed uses the population parameter from the null hypothesis.\\
+\vspace{0.1in}
+
+\textbf{b. Verify the conditions to test the hypotheses.}
+
+The conditions for performing an inference for a single proportion using a normal distribution are verified:
+\vspace{0.1in}
+\begin{enumerate}
+\item The sample is assumed to be independent as the sample is less than 10\% of internet users.
+\item Since $np_0=300(0.75)=225\geq10$ and $n(1-p_0)=75\geq10$ the binomial distribution can be approximated using a normal distribution.
+\end{enumerate}
+\vspace{0.1in}
+
+\textbf{c. Define the rejection region with respect to the sampling distribution and the rejection region with respect to the standard normal distribution at 5\% significance.}
+
+The sampling distribution for the null hypothesis of sample size $n=300$ is 
+centered at $\mu_{\hat{p}}=p_0=0.75$ and has standard error 
+$SE=\sigma_{\hat{p}}=\sqrt{\frac{p_0(1-p_0)}{n}}=\sqrt{\frac{0.75(0.25)}{300}}=0.025$.\\
+
+The hypotheses determine that the rejection region is the left tail.  The rejection region for the standard normal distribution is the interval $(-\infty, -Z_\alpha)=(-\infty, -1.645)$. The rejection region for the sampling distribution is $(-\infty,\hat{p}_l)$ where 
+\begin{align*}
+-Z_\alpha & = \frac{\hat{p}_l - p_0}{SE}\\
+\hat{p}_l & = p_0 - Z_\alpha SE = 0.75 - 1.645(0.025) = 0.71
+\end{align*} 
+Therefore the fail to reject region, ``acceptance region'', for the standard normal distribution is the interval $[-Z_\alpha, \infty)=[-1.645,\infty)$.  The fail to reject region, ``acceptance region'', for the sampling distribution is the interval $[\hat{p}_l, \infty)=[0.71,\infty)$.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  no markers, domain=-3.5:3.5, samples=200,
+  axis lines*=left,
+  hide y axis,
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=7in,
+  xtick={-1.645, 0}, ytick=\empty,
+  enlargelimits=false, clip=false, axis on top,
+  grid = major
+  ]
+  \addplot [pattern=north east lines, pattern color=cyan!50!black, draw=none, domain=-3.5:-1.645] {gauss(0,1)} \closedcycle;
+  \addplot [very thick,cyan!50!black] {gauss(0,1)};
+
+\draw [yshift=-0.6cm, latex-latex](axis cs:-3.5,0) -- node [fill=white] {rejection region of $H_0$} (axis cs:-1.645,0);
+\draw [yshift=-0.6cm, latex-latex](axis cs:-1.645,0) -- node [fill=white] {fail to reject region of $H_0$} (axis cs:3.5,0);
+\end{axis}
+\end{tikzpicture}
+\textit{Standard normal distribution with rejection region}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  no markers, domain=0.6:0.9, samples=200,
+  axis lines*=left,
+  hide y axis,
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=7in,
+  xtick={0.71, 0.75}, ytick=\empty,
+  enlargelimits=false, clip=false, axis on top,
+  grid = major
+  ]
+  \addplot [pattern=north east lines, pattern color=cyan!50!black, draw=none, domain=0.6:0.71] {gauss(0.75,0.025)} \closedcycle;
+  \addplot [very thick,cyan!50!black] {gauss(0.75,0.025)};
+
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.6,0) -- node [fill=white] {rejection region of $H_0$} (axis cs:0.71,0);
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.71,0) -- node [fill=white] {fail to reject region of $H_0$} (axis cs:0.9,0);
+\end{axis}
+
+
+
+\end{tikzpicture}
+\textit{Sampling distribution of sample proportion with rejection region}
+\end{center}
+\vspace{0.1in}
+
+\textbf{d. Test the hypothesis using the sample proportion, the test statistic and p-value at 5\% significance.}
+
+The below illustrates three different ways of performing a hypothesis claim:
+\vspace{0.1in}
+\begin{itemize}
+\item \textit{Using the sample proportion}\\
+It is clear that the sample proportion $\hat{p}=\frac{216}{300}=0.72$ lies in the fail to reject region.  Hence one fails to reject the null hypothesis. But one should note that  ``even if we fail to reject 
+the null hypothesis, we typically do not accept the null hypothesis as true. Failing to find strong evidence for the alternative hypothesis is not equivalent to accepting
+the null hypothesis,''\cite{OS}  although stating that ``we accept the null hypothesis'' will be allowed on the basis that it implies that the sample proportion was not enough evidence to reject the null hypothesis.\\
+
+
+\item \textit{Using the test statistic}\\
+The test statistic is:
+\begin{align*}
+Z & = \frac{\hat{p}-p_0}{SE} = \frac{\frac{216}{300}-0.75}{0.025} = -1.2
+\end{align*}
+
+Observe that the test statisic lies in the fail to reject region of the standard normal distribution.  Hence again it follows that the sample proportion fails to reject the null hypothesis.\\
+
+
+\item \textit{Using the p-value}\\
+\begin{quote}
+The \emph{p-value} is the probability of observing data at least as favorable to the alternative hypothesis as our current data set, if the null hypothesis is true.\cite{OS}
+\end{quote}
+In this problem, the $\text{p-value}=P(Z<-1.2)=0.1151$. Since $\text{p-value}\geq\alpha$ one fails to reject the null hypothesis.\\
+
+\end{itemize}
+\newpage
+
+\textbf{e. Determine the probability of committing an error (Type I or Type II) in the hypothesis test assumming that the true proportion of the population is $p_a=0.68$.}
+
+Because the null hypothesis was not rejected, there is a possibility of committing a type II error. A type II error is committed when one fails to reject the null hypothesis given that the null hypothesis is false.  Assuming an alternate proportion $p_a=0.65$ as the true proportion, it is possible to compute the probability of committing a type II error.\\
+
+Let $\hat{P}_a$ be the random variable associated to the sampling distribution of sample proportions $\hat{p}_a$ of sample size $n=300$ and true population proportion 
+assumed as $p_a = 0.68$. $\hat{P}_a$  is
+centered at $\mu_{\hat{p}_a}=p_a=0.65$ and has standard error
+$SE_a=\sigma_{\hat{p}_a}=\sqrt{\frac{p_a(1-p_a)}{n}}=\sqrt{\frac{0.68(0.32)}{300}}=0.027$.\\
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  no markers, domain=0.6:0.9, samples=200,
+  axis lines*=left,
+  hide y axis,
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=7in,
+  xtick={0.68,0.71,0.75}, ytick=\empty,
+  enlargelimits=false, clip=false, axis on top,
+  grid = major
+  ]
+  \addplot [pattern=north east lines, pattern color=cyan!50!black, domain=0.6:0.71] {gauss(0.75,0.025)} \closedcycle;
+  \addplot [pattern=horizontal lines ,pattern color=green!50!black, domain=0.71:0.9] {gauss(0.68,0.027)} \closedcycle;
+  \addplot [very thick,cyan!50!black] {gauss(0.75,0.025)};
+  \addplot [very thick,green!50!black] {gauss(0.68,0.027)};
+
+
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.6,0) -- node [fill=white] {rejection region of $H_0$} (axis cs:0.71,0);
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.71,0) -- node [fill=white] {fail to reject region of $H_0$} (axis cs:0.9,0);
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+The probability of committing a type II error is the probability that a sample proportion of $\hat{P}_a$ lies in the fail to reject region of $H_0$. 
+
+\begin{align*}
+\beta &= P(\text{fail to reject $H_0$}\;|\;\text{$H_0$ is false})\\
+&= P(\hat{P}_a>0.71)\\
+&= P\left(Z>\frac{0.71-p_a}{SE_a}\right)\\
+&= P\left(Z>\frac{0.71-0.68}{0.027}\right)\\
+&= P(Z>1.11) = 1 - P(Z<1.11) = 1 - 0.8665 = 0.1335
+\end{align*}
+
+Therefore the probability of commiting a type II error 
+is about 13\%, in the case where true population proportion is $p_a=0.68$. 
+The probability of committing a type II error is the area represented by horizontal stripes in the above diagram.\\
+\vspace{0.1in}
+
+\textbf{f. Determine the power of the test assumming that the true proportion of the population is $p_a=0.68$.}
+
+Once the probability of a type II error is computed, one can 
+determine the power of the test.  That is
+\begin{align*}
+\text{power of a test} & = P(\text{reject $H_0$}\; | \;\text{$H_0$ is false})\\
+& = 1-P(\text{fail to reject $H_0$}\; | \;\text{$H_0$ is false})\\
+& = 1 - \beta  = 1-0.13 = 0.87
+\end{align*}
+
+The larger the power of a test, the smaller the probability of committing a
+type II error.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  no markers, domain=0.6:0.9, samples=200,
+  axis lines*=left,
+  hide y axis,
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=7in,
+  xtick={0.68,0.71,0.75}, ytick=\empty,
+  enlargelimits=false, clip=false, axis on top,
+  grid = major
+  ]
+  \addplot [pattern=north east lines, pattern color=cyan!50!black, domain=0.6:0.71] {gauss(0.75,0.025)} \closedcycle;
+  \addplot [pattern=vertical lines ,pattern color=red!50!black, domain=0.6:0.71] {gauss(0.68,0.027)} \closedcycle;  
+  \addplot [pattern=horizontal lines ,pattern color=green!50!black, domain=0.71:0.9] {gauss(0.68,0.027)} \closedcycle;
+  \addplot [very thick,cyan!50!black] {gauss(0.75,0.025)};
+  \addplot [very thick,green!50!black] {gauss(0.68,0.027)};
+
+
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.6,0) -- node [fill=white] {rejection region of $H_0$} (axis cs:0.71,0);
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.71,0) -- node [fill=white] {fail to reject region of $H_0$} (axis cs:0.9,0);
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+The power of the test is the probability that a sample proportion of $\hat{P}_a$ lies in the rejection region of $H_0$. The probability is represented by the area with red vertical stripes in the above diagram.
+\vspace{0.1in}
+
+\textbf{g. Determine the sample size to control the error at $\alpha=\beta=0.05$ assuming that the true proportion of the population is $p_a=0.68$.}
+
+It is possible to control type I and type II error by changing 
+the sample size of the sample proportions.  
+
+Comparing $\hat{p}_l$ for both sampling distributions is required to determine the sample size. $\hat{p}_l$ is the proportion which 
+determines the boundary between the reject region and the fail to reject region of $H_0$.
+
+For the $H_0$:
+\begin{align*}
+-Z_\alpha & = \frac{\hat{p}_l - p_0}{SE}\\
+\hat{p}_l & = p_0 - Z_\alpha SE = 0.75 - 1.645\sqrt{\frac{0.75(1-0.75)}{n}}
+\end{align*}
+
+For $\hat{P}_a$:
+\begin{align*}
+Z_\beta & = \frac{\hat{p}_l - p_a}{SE_a}\\
+\hat{p}_l & = p_0 + Z_\beta SE_a = 0.68 + 1.645\sqrt{\frac{0.68(1-0.68)}{n}}
+\end{align*}
+
+
+Set the two above formulas for $\hat{p}_l$ equal and solve for $n$:
+\begin{align*}
+0.75 - 1.645\sqrt{\frac{0.75(1-0.25)}{n}} & = 0.68 + 1.645\sqrt{\frac{0.68(1-0.68)}{n}}\\
+0.75 - 0.68 & = 1.645\sqrt{\frac{0.68(1-0.68)}{n}}  + 1.645\sqrt{\frac{0.75(1-0.75)}{n}}\\
+\sqrt{n} & = 1.645\frac{\sqrt{0.68(1-0.68)}+\sqrt{0.75(1-0.75)}}{0.75-0.68}\\
+n &= \left(1.645\frac{\sqrt{0.68(1-0.68)}+\sqrt{0.75(1-0.75)}}{0.75-0.68}\right)^2\\
+n &= 446.81
+\end{align*}
+
+Hence with a sample size of $447$ both types of error are controlled at 5\% assuming that the
+true population parameter is $p_a=0.68$.
+
+If the sample size is $n=447$ then
+\begin{align*}
+SE&=\sigma_{\hat{p}}=\sqrt{\frac{p_0(1-p_0)}{n}}=\sqrt{\frac{0.75(0.25)}{447}}=0.020\\
+\hat{p}_l & = p_0 - Z_\alpha SE = 0.75- 1.645(0.020)=0.717\\
+SE_a&=\sigma_{\hat{p}_a}=\sqrt{\frac{p_a(1-p_a)}{n}}=\sqrt{\frac{0.68(0.32)}{447}}=0.022\\
+\end{align*}
+which results in the following sampling distributions.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  no markers, domain=0.6:0.9, samples=200,
+  axis lines*=left,
+  hide y axis,
+  every axis x label/.style={at=(current axis.right of origin),anchor=west},
+  height=5cm, width=7in,
+  xtick={0.68,0.717,0.75}, ytick=\empty,
+  enlargelimits=false, clip=false, axis on top,
+  grid = major
+  ]
+  \addplot [pattern=north east lines, pattern color=cyan!50!black, domain=0.6:0.717] {gauss(0.75,0.02)} \closedcycle;
+  \addplot [pattern=horizontal lines ,pattern color=green!50!black, draw=none, domain=0.717:0.9] {gauss(0.68,0.022)} \closedcycle;
+  \addplot [very thick,cyan!50!black] {gauss(0.75,0.02)};
+  \addplot [very thick,green!50!black] {gauss(0.68,0.022)};
+
+
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.6,0) -- node [fill=white] {rejection region of $H_0$} (axis cs:0.717,0);
+\draw [yshift=-0.6cm, latex-latex](axis cs:0.717,0) -- node [fill=white] {fail to reject region of $H_0$} (axis cs:0.9,0);
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+
+
+\begin{thebibliography}{9}
+\bibitem[OS]{OS}
+D.M. Diez,
+C.D. Barr and M. \c{C}etinkaya-Rundel. \textit{OpenIntro Statistics}, OpenIntro LaTeX, code, and PDFs are released under a Creative Commons BY-SA 3.0 license.
+\end{thebibliography}
+
+
+
+\end{document}
